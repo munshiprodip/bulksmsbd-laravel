@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BulkSmsBd\Laravel\Exceptions;
 
+/**
+ * Mapper utility to resolve BulkSMSBD numeric response codes (202, 1001-1032) to domain exceptions.
+ */
 class ResponseCodeMapper
 {
     /**
@@ -17,15 +20,15 @@ class ResponseCodeMapper
             'exception' => BulkSmsBdException::class,
         ],
         1001 => [
-            'message' => 'Invalid API Key or Authentication Failed',
+            'message' => 'Invalid Number',
             'exception' => AuthenticationException::class,
         ],
         1002 => [
-            'message' => 'Sender ID not correct or Sender ID is disabled',
+            'message' => 'Sender ID not correct or sender ID is disabled',
             'exception' => InvalidSenderIdException::class,
         ],
         1003 => [
-            'message' => 'Required fields missing or invalid request structure',
+            'message' => 'Required fields missing / Contact Your System Administrator',
             'exception' => ValidationException::class,
         ],
         1004 => [
@@ -33,7 +36,7 @@ class ResponseCodeMapper
             'exception' => ValidationException::class,
         ],
         1005 => [
-            'message' => 'Internal Server Error / Gateway Database Error',
+            'message' => 'Internal Error',
             'exception' => ServerException::class,
         ],
         1006 => [
@@ -41,7 +44,7 @@ class ResponseCodeMapper
             'exception' => InsufficientBalanceException::class,
         ],
         1007 => [
-            'message' => 'Balance Insufficient',
+            'message' => 'Insufficient Balance',
             'exception' => InsufficientBalanceException::class,
         ],
         1008 => [
@@ -57,11 +60,11 @@ class ResponseCodeMapper
             'exception' => ValidationException::class,
         ],
         1011 => [
-            'message' => 'User ID not found in system',
+            'message' => 'User ID not found',
             'exception' => AuthenticationException::class,
         ],
         1012 => [
-            'message' => 'Masking SMS must be sent in Bengali / Unicode format',
+            'message' => 'Masking SMS must be sent in Bengali',
             'exception' => ValidationException::class,
         ],
         1013 => [
@@ -73,7 +76,7 @@ class ResponseCodeMapper
             'exception' => InvalidSenderIdException::class,
         ],
         1015 => [
-            'message' => 'Sender ID has not found any valid Gateway by API key',
+            'message' => 'Sender ID has not found Any Valid Gateway by API key',
             'exception' => InvalidSenderIdException::class,
         ],
         1016 => [
@@ -85,11 +88,11 @@ class ResponseCodeMapper
             'exception' => InvalidSenderIdException::class,
         ],
         1018 => [
-            'message' => 'The Owner of this account is disabled',
+            'message' => 'The Owner of this Account is disabled',
             'exception' => AuthenticationException::class,
         ],
         1019 => [
-            'message' => 'The sender type price of this account is disabled',
+            'message' => 'The Price of this Account is disabled for this sender type',
             'exception' => InvalidSenderIdException::class,
         ],
         1020 => [
@@ -97,7 +100,7 @@ class ResponseCodeMapper
             'exception' => AuthenticationException::class,
         ],
         1021 => [
-            'message' => 'The parent active sender type price of this account is not found',
+            'message' => 'The parent active price of this account is not found',
             'exception' => InvalidSenderIdException::class,
         ],
         1022 => [
@@ -137,11 +140,11 @@ class ResponseCodeMapper
             'exception' => ServerException::class,
         ],
         1031 => [
-            'message' => 'Maximum bulk recipient count per request exceeded',
+            'message' => 'Your Account Not Verified, Please Contact Administrator',
             'exception' => ValidationException::class,
         ],
         1032 => [
-            'message' => 'Gateway Timeout or Upstream Operator failure',
+            'message' => 'IP Not whitelisted',
             'exception' => ServerException::class,
         ],
     ];
@@ -159,7 +162,11 @@ class ResponseCodeMapper
      */
     public static function getMessage(int $code, ?string $fallback = null): string
     {
-        return static::$mappings[$code]['message'] ?? $fallback ?? "Unknown BulkSMSBD Error Code ($code)";
+        if ($fallback !== null && !empty($fallback)) {
+            return $fallback;
+        }
+
+        return BulkSmsBdException::getMessageForCode($code);
     }
 
     /**
@@ -186,7 +193,7 @@ class ResponseCodeMapper
         array $rawResponse = []
     ): BulkSmsBdException {
         $mapping = static::$mappings[$code] ?? null;
-        $message = $customMessage ?? $mapping['message'] ?? "BulkSMSBD API Error with response code: {$code}";
+        $message = $customMessage ?? BulkSmsBdException::getMessageForCode($code);
         $exceptionClass = $mapping['exception'] ?? BulkSmsBdException::class;
 
         return new $exceptionClass($message, $code, $rawResponse);

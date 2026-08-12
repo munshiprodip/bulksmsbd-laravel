@@ -23,6 +23,7 @@ class ExceptionMapperTest extends TestCase
         $this->assertEquals('Invalid Number', BulkSmsBdException::getMessageForCode(1001));
         $this->assertEquals('Sender ID not correct or sender ID is disabled', BulkSmsBdException::getMessageForCode(1002));
         $this->assertEquals('Insufficient Balance', BulkSmsBdException::getMessageForCode(1007));
+        $this->assertEquals('IP Not whitelisted', BulkSmsBdException::getMessageForCode(1032));
         $this->assertEquals('Unknown API Error (Code: 9999)', BulkSmsBdException::getMessageForCode(9999));
     }
 
@@ -62,19 +63,47 @@ class ExceptionMapperTest extends TestCase
         }
     }
 
-    public function test_client_returns_formatted_response_array_when_throw_exceptions_disabled(): void
+    public function test_formats_real_gateway_success_and_error_responses(): void
     {
+        // 1. Code 202 Success Response
         Http::fake([
             'http://bulksmsbd.net/api/smsapi' => Http::response([
-                'response_code' => 1007,
-                'error_message' => 'Insufficient Balance',
+                'response_code' => 202,
+                'message_id' => 7966389,
+                'success_message' => 'SMS Submitted Successfully 1',
+                'error_message' => '',
             ], 200),
         ]);
 
-        $response = BulkSmsBd::setThrowExceptions(false)->send('01700000000', 'Test message');
+        $res1 = BulkSmsBd::setThrowExceptions(false)->send('01700000000', 'Test 1');
+        $this->assertTrue($res1['is_success']);
+        $this->assertEquals(7966389, $res1['message_id']);
+        $this->assertEquals('SMS Submitted Successfully 1', $res1['status_message']);
 
-        $this->assertFalse($response['is_success']);
-        $this->assertEquals(1007, $response['response_code']);
-        $this->assertEquals('Insufficient Balance', $response['status_message']);
+        // 2. Code 1001 Invalid Number
+        Http::fake([
+            'http://bulksmsbd.net/api/smsapi' => Http::response([
+                'response_code' => 1001,
+                'success_message' => '',
+                'error_message' => 'Invalid Number!',
+            ], 200),
+        ]);
+
+        $res2 = BulkSmsBd::setThrowExceptions(false)->send('01700000000', 'Test 2');
+        $this->assertFalse($res2['is_success']);
+        $this->assertEquals('Invalid Number!', $res2['status_message']);
+
+        // 3. Code 1032 IP Not Whitelisted
+        Http::fake([
+            'http://bulksmsbd.net/api/smsapi' => Http::response([
+                'response_code' => 1032,
+                'success_message' => '',
+                'error_message' => 'Your ip 115.127.145.116 not Whitelisted. Please whitelist ip from Phonebook',
+            ], 200),
+        ]);
+
+        $res3 = BulkSmsBd::setThrowExceptions(false)->send('01700000000', 'Test 3');
+        $this->assertFalse($res3['is_success']);
+        $this->assertEquals('Your ip 115.127.145.116 not Whitelisted. Please whitelist ip from Phonebook', $res3['status_message']);
     }
 }

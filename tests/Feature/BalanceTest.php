@@ -51,4 +51,19 @@ class BalanceTest extends TestCase
                 && $request['api_key'] === 'test_api_key_123';
         });
     }
+
+    public function test_cleans_high_precision_floating_point_balance_output(): void
+    {
+        Http::fake([
+            'http://bulksmsbd.net/api/getBalanceApi*' => Http::response([
+                'response_code' => 202,
+                'balance' => 49.64999999999999857891452847979962825775146484375,
+            ], 200),
+        ]);
+
+        $response = BulkSmsBd::getBalance('GET');
+
+        $this->assertEquals(49.65, $response['balance']);
+        $this->assertTrue($response['is_success']);
+    }
 }

@@ -169,6 +169,10 @@ class BulkSmsBd
             ];
         }
 
+        if (is_array($response) && isset($response['balance'])) {
+            $response['balance'] = round((float) $response['balance'], 4);
+        }
+
         return $this->formatResponse($response);
     }
 
@@ -183,16 +187,17 @@ class BulkSmsBd
     protected function formatResponse(?array $response): array
     {
         if (!$response) {
+            $fallbackMessage = BulkSmsBdException::getMessageForCode(1005);
             $result = [
-                'success' => false,
                 'response_code' => 1005,
-                'message' => BulkSmsBdException::getMessageForCode(1005),
-                'status_message' => BulkSmsBdException::getMessageForCode(1005),
+                'success_message' => '',
+                'error_message' => $fallbackMessage,
+                'status_message' => $fallbackMessage,
                 'is_success' => false,
             ];
 
             if ($this->throwExceptions) {
-                throw ResponseCodeMapper::mapToException(1005, $result['message'], $result);
+                throw ResponseCodeMapper::mapToException(1005, $result['error_message'], $result);
             }
 
             return $result;
@@ -202,11 +207,19 @@ class BulkSmsBd
 
         if ($code !== null) {
             $codeInt = (int) $code;
-            $response['status_message'] = BulkSmsBdException::getMessageForCode($codeInt);
-            $response['is_success'] = ($codeInt === 202);
+            $isSuccess = ($codeInt === 202);
 
-            if ($codeInt !== 202 && $this->throwExceptions) {
-                throw ResponseCodeMapper::mapToException($codeInt, $response['status_message'], $response);
+            $gatewayMessage = !empty($response['error_message'])
+                ? (string) $response['error_message']
+                : (!empty($response['success_message']) ? (string) $response['success_message'] : null);
+
+            $statusMessage = $gatewayMessage ?? BulkSmsBdException::getMessageForCode($codeInt);
+
+            $response['status_message'] = $statusMessage;
+            $response['is_success'] = $isSuccess;
+
+            if (!$isSuccess && $this->throwExceptions) {
+                throw ResponseCodeMapper::mapToException($codeInt, $statusMessage, $response);
             }
         }
 
