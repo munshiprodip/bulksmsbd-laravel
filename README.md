@@ -1,8 +1,8 @@
 # BulkSMSBD Laravel Wrapper Package
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/bulksmsbd/laravel-bulksmsbd.svg?style=flat-square)](https://packagist.org/packages/bulksmsbd/laravel-bulksmsbd)
-[![Total Downloads](https://img.shields.io/packagist/dt/bulksmsbd/laravel-bulksmsbd.svg?style=flat-square)](https://packagist.org/packages/bulksmsbd/laravel-bulksmsbd)
-[![License](https://img.shields.io/packagist/l/bulksmsbd/laravel-bulksmsbd.svg?style=flat-square)](LICENSE)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/munshiprodip/bulksmsbd-laravel.svg?style=flat-square)](https://packagist.org/packages/munshiprodip/bulksmsbd-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/munshiprodip/bulksmsbd-laravel.svg?style=flat-square)](https://packagist.org/packages/munshiprodip/bulksmsbd-laravel)
+[![License](https://img.shields.io/packagist/l/munshiprodip/bulksmsbd-laravel.svg?style=flat-square)](LICENSE)
 
 A clean, modern, PSR-12 compliant, production-ready Laravel wrapper package for the **BulkSMSBD** SMS Gateway API.
 
@@ -30,7 +30,7 @@ A clean, modern, PSR-12 compliant, production-ready Laravel wrapper package for 
 Install the package via Composer:
 
 ```bash
-composer require bulksmsbd/laravel-bulksmsbd
+composer require munshiprodip/bulksmsbd-laravel
 ```
 
 Publish the configuration file (optional):
@@ -52,7 +52,7 @@ $balanceInfo = BulkSmsBd::getBalance();
   Returns: 
   [
     "response_code" => 202,
-    "balance" => "150.50",
+    "balance" => 49.65,
     "status_message" => "SMS Submitted Successfully",
     "is_success" => true
   ]
@@ -83,6 +83,12 @@ use BulkSmsBd\Laravel\Exceptions\BulkSmsBdException;
 $message = BulkSmsBdException::getMessageForCode(1007);
 // Returns: "Insufficient Balance"
 ```
+
+---
+
+## Author
+
+- **Prodip Munshi** - [munshiprodip@gmail.com](mailto:munshiprodip@gmail.com)
 
 ---
 

@@ -1,5 +1,5 @@
 {
-    "name": "bulksmsbd/laravel-bulksmsbd",
+    "name": "munshiprodip/bulksmsbd-laravel",
     "description": "Clean, modern, PSR-12 compliant Laravel wrapper package for the BulkSMSBD SMS Gateway API",
     "type": "library",
     "keywords": [
@@ -11,12 +11,12 @@
         "otp",
         "package"
     ],
-    "homepage": "https://github.com/bulksmsbd/laravel-bulksmsbd",
+    "homepage": "https://github.com/munshiprodip/bulksmsbd-laravel",
     "license": "MIT",
     "authors": [
         {
-            "name": "BulkSMSBD Developer Team",
-            "email": "support@bulksmsbd.com"
+            "name": "Prodip Munshi",
+            "email": "munshiprodip@gmail.com"
         }
     ],
     "require": {
