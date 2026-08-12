@@ -33,10 +33,38 @@ Install the package via Composer:
 composer require munshiprodip/bulksmsbd-laravel
 ```
 
-Publish the configuration file (optional):
+---
+
+## Environment Setup (.env)
+
+Add your BulkSMSBD credentials and settings directly into your project's `.env` file:
+
+```env
+BULKSMSBD_API_KEY="your_bulksmsbd_api_key_here"
+BULKSMSBD_SENDER_ID="your_approved_sender_id"
+BULKSMSBD_BASE_URL="http://bulksmsbd.net"
+BULKSMSBD_TIMEOUT=15
+BULKSMSBD_THROW_EXCEPTIONS=true
+```
+
+### Configuration Publishing (Optional)
+
+Publish the package configuration file if you need to customize default settings:
 
 ```bash
 php artisan vendor:publish --tag="bulksmsbd-config"
+```
+
+This generates `config/bulksmsbd.php`:
+
+```php
+return [
+    'api_key' => env('BULKSMSBD_API_KEY', ''),
+    'sender_id' => env('BULKSMSBD_SENDER_ID', ''),
+    'base_url' => env('BULKSMSBD_BASE_URL', 'http://bulksmsbd.net'),
+    'timeout' => (int) env('BULKSMSBD_TIMEOUT', 15),
+    'throw_exceptions' => (bool) env('BULKSMSBD_THROW_EXCEPTIONS', true),
+];
 ```
 
 ---
@@ -62,7 +90,7 @@ $balanceInfo = BulkSmsBd::getBalance();
 $response = BulkSmsBd::send('88016xxxxxxxx', 'Your OTP is 1234');
 
 if ($response['is_success']) {
-    // SMS Sent
+    // SMS Sent successfully
 } else {
     // Show user-friendly error
     echo $response['status_message']; // e.g., "Insufficient Balance"
@@ -83,6 +111,15 @@ use BulkSmsBd\Laravel\Exceptions\BulkSmsBdException;
 $message = BulkSmsBdException::getMessageForCode(1007);
 // Returns: "Insufficient Balance"
 ```
+
+---
+
+## Support & Rating Request ⭐
+
+If you find this package helpful for your Laravel applications, please take a moment to **Star ⭐ the repository on GitHub** and share your rating! Your support helps other developers discover this package and encourages active maintenance.
+
+- **GitHub Repository**: [munshiprodip/bulksmsbd-laravel](https://github.com/munshiprodip/bulksmsbd-laravel)
+- **Packagist Package**: [munshiprodip/bulksmsbd-laravel](https://packagist.org/packages/munshiprodip/bulksmsbd-laravel)
 
 ---
 
